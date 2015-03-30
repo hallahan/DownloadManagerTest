@@ -30,8 +30,8 @@ import android.widget.ImageView;
  */
 public class MainActivity extends ActionBarActivity {
 
-//    private static final String URL = "http://overpass-api.de/api/interpreter?data=(way[building](47.65145486180013,-122.42340087890624,47.681743174340355,-122.32246398925781);way[highway](47.65145486180013,-122.42340087890624,47.681743174340355,-122.32246398925781););out%20meta;%3E;out%20meta%20qt;";
-    private static final String URL = "http://www.kyngchaos.com/files/software/qgis/QGIS-2.8.1-1.dmg";
+    private static final String URL = "http://overpass-api.de/api/interpreter?data=(way[building](47.65145486180013,-122.42340087890624,47.681743174340355,-122.32246398925781);way[highway](47.65145486180013,-122.42340087890624,47.681743174340355,-122.32246398925781););out%20meta;%3E;out%20meta%20qt;";
+//    private static final String URL = "http://www.kyngchaos.com/files/software/qgis/QGIS-2.8.1-1.dmg";
     private long enqueue;
     private DownloadManager dm;
     private ProgressDialog progressDialog;
@@ -106,8 +106,8 @@ public class MainActivity extends ActionBarActivity {
           // short
 //        Uri.parse("http://overpass-api.de/api/interpreter?data=(way[building](47.66924559516471,-122.38838195800781,47.671730901355055,-122.3812687397003);way[highway](47.66924559516471,-122.38838195800781,47.671730901355055,-122.3812687397003););out%20meta;%3E;out%20meta%20qt;"));
         
-        request.setTitle("OSM XML");
-        request.setDescription("An example of a GET from Overpass API.");
+//        request.setTitle("OSM XML");
+//        request.setDescription("An example of a GET from Overpass API.");
         request.setDestinationInExternalPublicDir("/", "overpass-test.osm");
         
         enqueue = dm.enqueue(request);
@@ -126,10 +126,10 @@ public class MainActivity extends ActionBarActivity {
     public void setupProgress() {
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Downloading OSM Data");
-        progressDialog.setMessage("");
-        progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
-        progressDialog.setProgress(0);
-        progressDialog.setMax(100);
+        progressDialog.setMessage("Hey Kid, I'm a computer! Stop all the downloadin'!!!");
+        progressDialog.setIndeterminate(true);
+        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        progressDialog.setCancelable(true);
         progressDialog.show();       
         
         new Thread(new Runnable() {
@@ -141,20 +141,22 @@ public class MainActivity extends ActionBarActivity {
                     q.setFilterById(enqueue);
                     Cursor cursor = dm.query(q);
                     cursor.moveToFirst();
-                    int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-                    int bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+                    final int bytesDownloaded = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+//                    int bytesTotal = cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
                     if (cursor.getInt(cursor.getColumnIndex(DownloadManager.COLUMN_STATUS)) == DownloadManager.STATUS_SUCCESSFUL) {
                         downloading = false;
                     }
-                    final double dlProgress = (int) ((bytesDownloaded * 100l) / bytesTotal);
+//                    final double dlProgress = (int) ((bytesDownloaded * 100l) / bytesTotal);
+                    final String msg = "Downloading OSM XML from Overpass API:\n\n" + ((double)bytesDownloaded) / 1000000.0 + " MB";
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            progressDialog.setProgress((int)dlProgress);    
+                            progressDialog.setMessage(msg);
                         }
                     });
-                    Log.d("YO!", statusMessage(cursor, bytesDownloaded, bytesTotal));
+                    Log.d("YO!", statusMessage(cursor, bytesDownloaded, 0));
                     cursor.close();
+
                 }
             }
         }).start();
